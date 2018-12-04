@@ -19,7 +19,8 @@ parser.add_argument('--batch_size', type=int, default=8, help='batch size')
 parser.add_argument('--ngf', type=int, default=64)
 parser.add_argument('--ndf', type=int, default=32)
 parser.add_argument('--nb', type=int, default=8, help='the number of resnet block layer for generator')
-parser.add_argument('--input_size', type=int, default=256, help='input size')
+parser.add_argument('--input_size_h', type=int, default=240, help='input size height')
+parser.add_argument('--input_size_w', type=int, default=320, help='input size width')
 parser.add_argument('--train_epoch', type=int, default=100)
 parser.add_argument('--pre_train_epoch', type=int, default=10)
 parser.add_argument('--lrD', type=float, default=0.0002, help='learning rate, default=0.0002')
@@ -55,7 +56,8 @@ else:
 
 # data_loader
 src_transform = transforms.Compose([
-        transforms.Resize((args.input_size, args.input_size)),
+        transforms.Resize((240, 427)),
+        transforms.CenterCrop((args.input_size_h, args.input_size_w)),
         transforms.ToTensor(),
         transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
 ])
@@ -176,8 +178,8 @@ train_hist['per_epoch_time'] = []
 train_hist['total_time'] = []
 print('training start!')
 start_time = time.time()
-real = torch.ones(args.batch_size, 1, args.input_size // 4, args.input_size // 4).to(device)
-fake = torch.zeros(args.batch_size, 1, args.input_size // 4, args.input_size // 4).to(device)
+real = torch.ones(args.batch_size, 1, args.input_size_h // 4, args.input_size_w // 4).to(device)
+fake = torch.zeros(args.batch_size, 1, args.input_size_h // 4, args.input_size_w // 4).to(device)
 for epoch in range(args.train_epoch):
     epoch_start_time = time.time()
     G.train()
@@ -187,8 +189,8 @@ for epoch in range(args.train_epoch):
     Gen_losses = []
     Con_losses = []
     for (x, _), (y, _) in zip(train_loader_src, train_loader_tgt):
-        e = y[:, :, :, args.input_size:]
-        y = y[:, :, :, :args.input_size]
+        e = y[:, :, :, args.input_size_w:]
+        y = y[:, :, :, :args.input_size_w]
         x, y, e = x.to(device), y.to(device), e.to(device)
 
         # train D
