@@ -258,7 +258,7 @@ for epoch in range(args.train_epoch):
                 result = torch.cat((x[0], G_recon[0]), 2)
                 path = os.path.join(args.name + '_results', 'Transfer', str(epoch+1) + '_epoch_' + args.name + '_test_' + str(n + 1) + '.png')
                 plt.imsave(path, (result.cpu().numpy().transpose(1, 2, 0) + 1) / 2)
-                if n == 4 and epoch != args.train_epoch - 1:
+                if n == 4:
                     break
 
             torch.save(G.state_dict(), os.path.join(args.name + '_results', 'generator_latest.pkl'))
