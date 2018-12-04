@@ -1,14 +1,34 @@
+"""
+
+"""
+
 import os
-dir_cleanup = 'C:/SCHOOL/CV/lion_king_frames'
-l = os.listdir(dir_cleanup)
+import subprocess
+dirs_cleanup = [
+    'data/tgt_data/train',
+    # 'data/tgt_data/pair',
+    'data/src_data/train',
+    # 'data/src_data/test'
+]
+
 
 
 if __name__ == "__main__":
     # print(os.getcwd())
-    i = 0
-    for n in l:
-        i += 1
-        if i % 2 == 0:
-            target = dir_cleanup + '/' + n
-            os.unlink(target)
-            print("deleting", (i / 2) + 1)
+    for dir in dirs_cleanup:
+        old_dir = dir + '_backup'
+        if not os.path.exists(old_dir):
+            command = 'cp -r {} {}'.format(dir, old_dir)
+            print(command)
+            subprocess.call(command, shell=True)
+        else:
+            print('{} exists, not saving a new one'.format(old_dir))
+        l = os.listdir(dir)
+        
+        i = 0
+        for n in l:
+            i += 1
+            if i % 3 == 0:
+                target = dir + '/' + n
+                os.unlink(target)
+                print("deleting", (i / 3) + 1)
