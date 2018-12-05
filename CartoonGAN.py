@@ -5,6 +5,8 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 from torchvision import transforms
 from edge_promoting import edge_promoting
+import random
+from chainer import Variable
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--name', required=False, default='project_name',  help='')
@@ -30,7 +32,16 @@ parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for Adam opt
 parser.add_argument('--beta2', type=float, default=0.999, help='beta2 for Adam optimizer')
 parser.add_argument('--latest_generator_model', required=False, default='', help='the latest trained model path')
 parser.add_argument('--latest_discriminator_model', required=False, default='', help='the latest trained model path')
+
+parser.add_argument('--lambda_noise', default=1000.0, type=float, help='training weight of the popping induced by noise')
+parser.add_argument('--noise', default=10, type=int, help='range of noise for popping reduction')
+parser.add_argument('--noisecount', default=0, type=int, help='number of pixels to modify with noise')
+
 args = parser.parse_args()
+
+lambda_noise = args.lambda_noise
+noise_range = args.noise
+noise_count = args.noisecount
 
 print('------------ Options -------------')
 for k, v in sorted(vars(args).items()):
@@ -189,10 +200,30 @@ for epoch in range(args.train_epoch):
     Disc_losses = []
     Gen_losses = []
     Con_losses = []
+    Noise_losses = []
+    #prepare a noise image
+    if noise_count:
+        noiseimg = xp.zeros((3, args.input_size_h, args.input_size_w), dtype=xp.float32)
+        for ii in range(noise_count):
+            xx = random.randrange(image_size)
+            yy = random.randrange(image_size)
+            noiseimg[0][yy][xx] += random.randrange(-noise_range, noise_range)
+            noiseimg[1][yy][xx] += random.randrange(-noise_range, noise_range)
+            noiseimg[2][yy][xx] += random.randrange(-noise_range, noise_range)
+
+
     for (x, _), (y, _) in zip(train_loader_src, train_loader_tgt):
         e = y[:, :, :, args.input_size_w:]
         y = y[:, :, :, :args.input_size_w]
         x, y, e = x.to(device), y.to(device), e.to(device)
+
+        #add noise image to source image
+        if noise_count:
+            noisy_x = x.copy()
+            noisy_x = noisy_x + noiseimg
+            noisy_x = Variable(noisy_x)
+            noisy_G = model(noisy_x)
+
 
         # train D
         D_optimizer.zero_grad()
@@ -225,7 +256,11 @@ for epoch in range(args.train_epoch):
         G_feature = VGG((G_ + 1) / 2)
         Con_loss = args.con_lambda * L1_loss(G_feature, x_feature.detach())
 
-        Gen_loss = D_fake_loss + Con_loss
+        #train noise
+        if noise_count:
+            G_pop = lambda_noise*F.mean_squared_error(G, noisy_G)
+            
+        Gen_loss = D_fake_loss + Con_loss + G_pop
         Gen_losses.append(D_fake_loss.item())
         train_hist['Gen_loss'].append(D_fake_loss.item())
         Con_losses.append(Con_loss.item())
@@ -238,8 +273,8 @@ for epoch in range(args.train_epoch):
     per_epoch_time = time.time() - epoch_start_time
     train_hist['per_epoch_time'].append(per_epoch_time)
     print(
-    '[%d/%d] - time: %.2f, Disc loss: %.3f, Gen loss: %.3f, Con loss: %.3f' % ((epoch + 1), args.train_epoch, per_epoch_time, torch.mean(torch.FloatTensor(Disc_losses)),
-        torch.mean(torch.FloatTensor(Gen_losses)), torch.mean(torch.FloatTensor(Con_losses))))
+            '[%d/%d] - time: %.2f, Disc loss: %.3f, Gen loss: %.3f, Con loss: %.3f, Noise loss: %.3f' % ((epoch + 1), args.train_epoch, per_epoch_time, torch.mean(torch.FloatTensor(Disc_losses)),
+        torch.mean(torch.FloatTensor(Gen_losses)), torch.mean(torch.FloatTensor(Con_losses)), torch.mean(torch.FloatTensor(G_pop))))
 
     if epoch % 2 == 1 or epoch == args.train_epoch - 1:
         with torch.no_grad():
