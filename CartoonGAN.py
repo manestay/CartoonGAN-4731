@@ -19,7 +19,7 @@ parser.add_argument('--batch_size', type=int, default=8, help='batch size')
 parser.add_argument('--ngf', type=int, default=64)
 parser.add_argument('--ndf', type=int, default=32)
 parser.add_argument('--nb', type=int, default=8, help='the number of resnet block layer for generator')
-parser.add_argument('--input_size_h', type=int, default=240, help='input size height')
+parser.add_argument('--input_size_h', type=int, default=180, help='input size height')
 parser.add_argument('--input_size_w', type=int, default=320, help='input size width')
 parser.add_argument('--train_epoch', type=int, default=100)
 parser.add_argument('--pre_train_epoch', type=int, default=10)
@@ -56,12 +56,13 @@ else:
 
 # data_loader
 src_transform = transforms.Compose([
-        transforms.Resize((240, 427)),
-        transforms.CenterCrop((args.input_size_h, args.input_size_w)),
+        transforms.Resize((args.input_size_h, args.input_size_w)),
+        # transforms.CenterCrop((args.input_size_h, args.input_size_w)),
         transforms.ToTensor(),
         transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
 ])
 tgt_transform = transforms.Compose([
+        transforms.Resize((args.input_size_h, args.input_size_w * 2)),
         transforms.ToTensor(),
         transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
 ])
@@ -261,8 +262,8 @@ for epoch in range(args.train_epoch):
                 if n == 4:
                     break
 
-            torch.save(G.state_dict(), os.path.join(args.name + '_results', 'generator_latest.pkl'))
-            torch.save(D.state_dict(), os.path.join(args.name + '_results', 'discriminator_latest.pkl'))
+            torch.save(G.state_dict(), os.path.join(args.name + '_results', 'generator_{}.pkl'.format(epoch + 1)))
+            torch.save(D.state_dict(), os.path.join(args.name + '_results', 'discriminator_{}.pkl'.format(epoch + 1)))
 
 total_time = time.time() - start_time
 train_hist['total_time'].append(total_time)

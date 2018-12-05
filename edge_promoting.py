@@ -27,9 +27,9 @@ def edge_promoting(root, save):
             continue
         rgb_img = cv2.imread(fp)
         gray_img = cv2.imread(fp, 0)
-        # rgb_img = cv2.resize(rgb_img, (320, 240))
+        rgb_img = cv2.resize(rgb_img, (320, 180))
         pad_img = np.pad(rgb_img, ((2,2), (2,2), (0,0)), mode='reflect')
-        # gray_img = cv2.resize(gray_img, (320, 240))
+        gray_img = cv2.resize(gray_img, (320, 180))
         edges = cv2.Canny(gray_img, 100, 200)
         dilation = cv2.dilate(edges, kernel)
 
