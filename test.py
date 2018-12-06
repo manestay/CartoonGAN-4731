@@ -12,7 +12,7 @@ parser.add_argument('--out_ngc', type=int, default=3, help='output channel for g
 parser.add_argument('--batch_size', type=int, default=8, help='batch size')
 parser.add_argument('--ngf', type=int, default=64)
 parser.add_argument('--nb', type=int, default=8, help='the number of resnet block layer for generator')
-parser.add_argument('--input_size_h', type=int, default=240, help='input size height')
+parser.add_argument('--input_size_h', type=int, default=180, help='input size height')
 parser.add_argument('--input_size_w', type=int, default=320, help='input size width')
 parser.add_argument('--pre_trained_model', required=True, default='pre_trained_model', help='pre_trained cartoongan model path')
 parser.add_argument('--image_dir', required=True, default='image_dir', help='test image path')
@@ -41,9 +41,10 @@ image_src = utils.data_load(os.path.join(args.image_dir), 'test', src_transform,
 os.makedirs(args.output_image_dir, exist_ok=True)
 with torch.no_grad():
     G.eval()
+    num_digits = len(str(len(image_src)))
     for n, (x, _) in enumerate(image_src):
         x = x.to(device)
         G_recon = G(x)
         result = torch.cat((x[0], G_recon[0]), 2)
-        path = os.path.join(args.output_image_dir, str(n + 1) + '.png')
+        path = os.path.join(args.output_image_dir, str(n + 1).zfill(num_digits) + '.png')
         plt.imsave(path, (result.cpu().numpy().transpose(1, 2, 0) + 1) / 2)
