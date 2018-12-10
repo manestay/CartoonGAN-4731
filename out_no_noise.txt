@@ -18,4 +18,15 @@
 [18/100] - time: 634.17, Disc loss: 0.687, Gen loss: 2.959, Con loss: 6.308, Noise loss: 26.945
 [19/100] - time: 634.25, Disc loss: 0.694, Gen loss: 3.044, Con loss: 6.270, Noise loss: 28.603
 [20/100] - time: 634.31, Disc loss: 0.684, Gen loss: 2.988, Con loss: 6.261, Noise loss: 27.401
+[21/100] - time: 633.98, Disc loss: 0.665, Gen loss: 3.082, Con loss: 6.391, Noise loss: 34.320
+[22/100] - time: 633.97, Disc loss: 0.650, Gen loss: 3.119, Con loss: 6.310, Noise loss: 27.039
+[23/100] - time: 634.05, Disc loss: 0.670, Gen loss: 3.078, Con loss: 6.426, Noise loss: 27.169
+[24/100] - time: 634.23, Disc loss: 0.656, Gen loss: 3.119, Con loss: 6.381, Noise loss: 32.580
+[25/100] - time: 634.17, Disc loss: 0.682, Gen loss: 3.028, Con loss: 6.373, Noise loss: 28.344
+[26/100] - time: 634.19, Disc loss: 0.663, Gen loss: 3.021, Con loss: 6.495, Noise loss: 32.061
+[27/100] - time: 634.46, Disc loss: 0.634, Gen loss: 3.054, Con loss: 6.379, Noise loss: 29.253
+[28/100] - time: 634.43, Disc loss: 0.614, Gen loss: 3.256, Con loss: 6.604, Noise loss: 31.252
+[29/100] - time: 634.19, Disc loss: 0.632, Gen loss: 3.167, Con loss: 6.446, Noise loss: 28.377
+[30/100] - time: 634.48, Disc loss: 0.628, Gen loss: 3.118, Con loss: 6.506, Noise loss: 28.197
+
 ...
