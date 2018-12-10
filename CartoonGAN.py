@@ -22,7 +22,7 @@ parser.add_argument('--ndf', type=int, default=32)
 parser.add_argument('--nb', type=int, default=8, help='the number of resnet block layer for generator')
 parser.add_argument('--input_size_h', type=int, default=180, help='input size height')
 parser.add_argument('--input_size_w', type=int, default=320, help='input size width')
-parser.add_argument('--train_epoch', type=int, default=100)
+parser.add_argument('--train_epoch', type=int, default=80)
 parser.add_argument('--pre_train_epoch', type=int, default=10)
 parser.add_argument('--lrD', type=float, default=0.0002, help='learning rate, default=0.0002')
 parser.add_argument('--lrG', type=float, default=0.0002, help='learning rate, default=0.0002')
@@ -113,6 +113,7 @@ print('-----------------------------------------------')
 # loss
 BCE_loss = nn.BCELoss().to(device)
 L1_loss = nn.L1Loss().to(device)
+L1_loss2 = nn.L1Loss().to(device)
 MSE_loss = nn.MSELoss().to(device)
 
 # Adam optimizer
@@ -285,6 +286,7 @@ for epoch in range(args.train_epoch):
     per_epoch_time = time.time() - epoch_start_time
     train_hist['per_epoch_time'].append(per_epoch_time)
     if noise_count:
+
         print(
                 '[%d/%d] - time: %.2f, Disc loss: %.3f, Gen loss: %.3f, Con loss: %.3f, Noise loss: %.3f' % ((epoch + 1), args.train_epoch, per_epoch_time, torch.mean(torch.FloatTensor(Disc_losses)),
             torch.mean(torch.FloatTensor(Gen_losses)), torch.mean(torch.FloatTensor(Con_losses)), torch.mean(torch.FloatTensor(Noise_losses))))
